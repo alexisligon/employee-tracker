@@ -67,13 +67,39 @@ const questions = [
   }
 ]
 
-//adding a department
+//adding a department question
 const addDept = 
 [
   {
     type: 'input',
     message: 'What department would you like to add?',
     name: 'departmentType'
+  }
+]
+
+//add employee questions
+const addEmp = 
+[
+  {
+    type: 'input',
+    message: "What is the employee's first name?",
+    name: 'empFirstName'
+  },
+  {
+    type: 'input',
+    message: "What is the employee's last name?",
+    name: 'empLastName'
+  },
+  {
+    type: 'input',
+    message: "What is the employee's job role?",
+    name: 'empJobRole'
+  },
+  {
+    type: 'list',
+    message: "Who is the employee's manager?",
+    name: 'empsMan',
+    choices: ['Manager 1', 'Manager 2', 'Manager 3']
   }
 ]
 
@@ -85,9 +111,19 @@ init = () => {
         case ('ADD_DEPARTMENT'):
           inquirer.prompt(addDept)
           .then((answer) => {
-            console.log('department type: ', answer.departmentType)
+            console.log('Department Type: ', answer.departmentType)
           })
           break;
+
+          case ('ADD_EMPLOYEE'):
+            inquirer.prompt(addEmp)
+            .then((answer) => {
+              console.log('First Name: ', answer.empFirstName);
+              console.log('Last Name: ', answer.empLastName);
+              console.log('Job Role: ', answer.empJobRole);
+              console.log('Manager: ', answer.empsMan)
+            })
+            break;
       
         default:
           break;
