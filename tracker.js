@@ -1,12 +1,11 @@
 const inquirer = require('inquirer');
 
-//choices for inquirer
-
+//initial question for what to do
 const questions = [
   {
     type: 'list',
     message: 'What would you like to do?',
-    name: 'choices',
+    name: 'firstChoice',
     choices: [
       {
         name: "View All Employees",
@@ -68,10 +67,32 @@ const questions = [
   }
 ]
 
-function init() {
+//adding a department
+const addDept = 
+[
+  {
+    type: 'input',
+    message: 'What department would you like to add?',
+    name: 'departmentType'
+  }
+]
+
+init = () => {
     inquirer.prompt(questions)
     .then((answer) => {
-      console.log('answer: ', answer.choices)
+      console.log('answer: ', answer.firstChoice);
+      switch (answer.firstChoice) {
+        case ('ADD_DEPARTMENT'):
+          inquirer.prompt(addDept)
+          .then((answer) => {
+            console.log('department type: ', answer.departmentType)
+          })
+          break;
+      
+        default:
+          break;
+      }
+      
     })
 }
 
