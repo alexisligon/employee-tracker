@@ -1,4 +1,13 @@
 const inquirer = require('inquirer');
+const mysql = require('mysql');
+
+const connection = mysql.createConnection({
+  host: 'localhost',
+  port: 3306,
+  user: 'root',
+  password: 'password',
+  database: 'employeeTracker_DB',
+});
 
 //initial question for what to do
 const questions = [
@@ -69,6 +78,7 @@ const questions = [
 
 //adding a department question
 const addDept = 
+//add this data to department table
 [
   {
     type: 'input',
@@ -79,6 +89,7 @@ const addDept =
 
 //add employee questions
 const addEmp = 
+//add this data to employee table
 [
   {
     type: 'input',
@@ -90,6 +101,8 @@ const addEmp =
     message: "What is the employee's last name?",
     name: 'empLastName'
   },
+  //change job role question from input to list type
+  //choose from job roles already entered
   {
     type: 'input',
     message: "What is the employee's job role?",
@@ -100,6 +113,27 @@ const addEmp =
     message: "Who is the employee's manager?",
     name: 'empsMan',
     choices: ['Manager 1', 'Manager 2', 'Manager 3']
+  }
+]
+
+const addRole = 
+//insert this data into role table on sql
+[
+  {
+    type: 'input',
+    message: 'What job role do you want to add?',
+    name: 'jobRole'
+  },
+  {
+    type: 'input',
+    message: 'What is the starting salary for this job role?',
+    name: 'jobSalary'
+  },
+  {
+    type: 'list',
+    message: 'What department is this job role in?',
+    name: 'roleDepartment',
+    choices: ['Human Resource', 'Marketing', 'Customer Service', 'Sales', 'Research', 'Development']
   }
 ]
 
@@ -118,12 +152,30 @@ init = () => {
           case ('ADD_EMPLOYEE'):
             inquirer.prompt(addEmp)
             .then((answer) => {
-              console.log('First Name: ', answer.empFirstName);
-              console.log('Last Name: ', answer.empLastName);
-              console.log('Job Role: ', answer.empJobRole);
-              console.log('Manager: ', answer.empsMan)
+              connection.query(
+                'INSERT INTO employee SET ?',
+                {
+                  first_name: answer.empFirstName,
+                  last_name: answer.empLastName,
+                  role_id: answer.empJobRole,
+                  manager_id: answer.empsMan,
+                },
+                (err) => {
+                  if (err) throw err;
+                  console.log('employee added successfully!');
+                  init();
+                }
+                )
             })
             break;
+
+          case ('ADD_ROLE'):
+            inquirer.prompt(addRole)
+            .then((answer) => {
+              console.log('Job Role: ', answer.jobRole);
+              console.log('Salary: ', answer.jobSalary);
+              console.log('Department: ', answer.roleDepartment);
+            })
       
         default:
           break;
@@ -132,7 +184,16 @@ init = () => {
     })
 }
 
-init();
+connection.connect((err) => {
+  if (err) throw err;
+  init();
+});
+
+//add employee
+const addEMP1 = () => {
+  
+}
+
 
 //What would you like to do?
 
