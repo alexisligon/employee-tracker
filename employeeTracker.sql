@@ -13,7 +13,8 @@ CREATE TABLE role (
 id INT NOT NULL AUTO_INCREMENT,
 title VARCHAR(30),
 salary DECIMAL(6),
-department_id INT,
+--change department_id to INT
+department_id VARCHAR(30),
 PRIMARY KEY (id)
 );
 

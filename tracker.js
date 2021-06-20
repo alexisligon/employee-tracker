@@ -172,9 +172,20 @@ init = () => {
           case ('ADD_ROLE'):
             inquirer.prompt(addRole)
             .then((answer) => {
-              console.log('Job Role: ', answer.jobRole);
-              console.log('Salary: ', answer.jobSalary);
-              console.log('Department: ', answer.roleDepartment);
+              connection.query(
+                'INSERT INTO role SET ?',
+                {
+                  title: answer.jobRole,
+                  salary: answer.jobSalary,
+                  department_id: answer.roleDepartment,
+                  
+                },
+                (err) => {
+                  if (err) throw err;
+                  console.log('job role added successfully!');
+                  init();
+                }
+                )
             })
       
         default:
@@ -189,10 +200,6 @@ connection.connect((err) => {
   init();
 });
 
-//add employee
-const addEMP1 = () => {
-  
-}
 
 
 //What would you like to do?
