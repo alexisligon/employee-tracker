@@ -202,20 +202,38 @@ init = () => {
           break;
 
         case ('QUIT'):
-          connection.end();
-        
-        case ('VIEW_EMPLOYEES'):
-          connection.query('SELECT * FROM employee', 
-          (err, results) => {
-            if(err) throw err;
-            
-            const employeeArray = [];
-            results.forEach(({first_name, last_name, role_id, manager_id}) => {
-              employeeArray.push({first_name, last_name, role_id, manager_id});
-            });
-            console.table(employeeArray);
-          })
+          process.exit();
           
+
+        case ('VIEW_DEPARTMENTS'):
+          connection.query('SELECT * FROM department',
+            (err, results) => {
+              if (err) throw err;
+
+              const departmentArray = [];
+              results.forEach(({ id, name }) => {
+                departmentArray.push({ id, name });
+              });
+              console.table('Departments', departmentArray);
+              init();
+            })
+          break;
+
+        case ('VIEW_EMPLOYEES'):
+          connection.query('SELECT * FROM employee',
+            (err, results) => {
+              if (err) throw err;
+
+              const employeeArray = [];
+              results.forEach(({ first_name, last_name, role_id, manager_id }) => {
+                employeeArray.push({first_name, last_name, role_id, manager_id} );
+              });
+              console.table(employeeArray);
+              init();
+            })
+            
+          break;
+
 
         default:
           break;
