@@ -203,7 +203,7 @@ init = () => {
 
         case ('QUIT'):
           process.exit();
-          
+
 
         case ('VIEW_DEPARTMENTS'):
           connection.query('SELECT * FROM department',
@@ -226,12 +226,12 @@ init = () => {
 
               const employeeArray = [];
               results.forEach(({ first_name, last_name, role_id, manager_id }) => {
-                employeeArray.push({first_name, last_name, role_id, manager_id} );
+                employeeArray.push({ first_name, last_name, role_id, manager_id });
               });
               console.table(employeeArray);
               init();
             })
-            
+
           break;
 
 
