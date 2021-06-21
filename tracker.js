@@ -105,9 +105,10 @@ const addEmp =
     //change job role question from input to list type
     //choose from job roles already entered
     {
-      type: 'input',
+      type: 'list',
       message: "What is the employee's job role?",
-      name: 'empJobRole'
+      name: 'empJobRole',
+      choices: ['Engineer', 'Intern', 'Manager']
     },
     {
       type: 'list',
@@ -118,26 +119,61 @@ const addEmp =
   ]
 
 //add job role questions
-const addRole =
-  //insert this data into role table on sql
-  [
-    {
-      type: 'input',
-      message: 'What job role do you want to add?',
-      name: 'jobRole'
-    },
-    {
-      type: 'input',
-      message: 'What is the starting salary for this job role?',
-      name: 'jobSalary'
-    },
-    {
-      type: 'list',
-      message: 'What department is this job role in?',
-      name: 'roleDepartment',
-      choices: ['Human Resource', 'Marketing', 'Customer Service', 'Sales', 'Research', 'Development']
+const addRole = () => {
+
+  connection.query(
+    'SELECT * FROM department',
+    (err, results) => {
+      if (err) throw err;
+      console.log(results);
+      const choices = results.map(function (department){
+          return {
+            value: department.id,
+            name: department.name,
+          }
+      })
+
+
+      inquirer.prompt([
+        {
+          type: 'input',
+          message: 'What job role do you want to add?',
+          name: 'jobRole'
+        },
+        {
+          type: 'input',
+          message: 'What is the starting salary for this job role?',
+          name: 'jobSalary'
+        },
+        {
+          type: 'list',
+          message: 'What department is this job role in?',
+          name: 'roleDepartment',
+          choices: choices
+        }
+      ])
+        .then((answer) => {
+          connection.query(
+            'INSERT INTO role SET ?',
+            {
+              title: answer.jobRole,
+              salary: answer.jobSalary,
+              department_id: answer.roleDepartment,
+
+            },
+            (err) => {
+              if (err) throw err;
+              console.log('job role added successfully!');
+              init();
+            }
+          )
+        })
     }
-  ]
+    )
+
+}
+  //insert this data into role table on sql
+  
 
 init = () => {
   inquirer.prompt(questions)
@@ -162,6 +198,9 @@ init = () => {
           break;
 
         case ('ADD_EMPLOYEE'):
+          // connection.query(
+          //   'SELECT * FROM employee WHERE manager'
+          // )
           inquirer.prompt(addEmp)
             .then((answer) => {
               connection.query(
@@ -182,23 +221,7 @@ init = () => {
           break;
 
         case ('ADD_ROLE'):
-          inquirer.prompt(addRole)
-            .then((answer) => {
-              connection.query(
-                'INSERT INTO role SET ?',
-                {
-                  title: answer.jobRole,
-                  salary: answer.jobSalary,
-                  department_id: answer.roleDepartment,
-
-                },
-                (err) => {
-                  if (err) throw err;
-                  console.log('job role added successfully!');
-                  init();
-                }
-              )
-            })
+          addRole();
           break;
 
         case ('QUIT'):
@@ -231,7 +254,6 @@ init = () => {
               console.table(employeeArray);
               init();
             })
-
           break;
 
 
