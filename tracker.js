@@ -1,5 +1,6 @@
 const inquirer = require('inquirer');
 const mysql = require('mysql');
+const cTable = require('console.table');
 
 const connection = mysql.createConnection({
   host: 'localhost',
@@ -200,8 +201,21 @@ init = () => {
             })
           break;
 
-          case ('QUIT'):
-            process.exit();
+        case ('QUIT'):
+          connection.end();
+        
+        case ('VIEW_EMPLOYEES'):
+          connection.query('SELECT * FROM employee', 
+          (err, results) => {
+            if(err) throw err;
+            
+            const employeeArray = [];
+            results.forEach(({first_name, last_name, role_id, manager_id}) => {
+              employeeArray.push({first_name, last_name, role_id, manager_id});
+            });
+            console.table(employeeArray);
+          })
+          
 
         default:
           break;
