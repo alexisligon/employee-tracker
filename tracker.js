@@ -250,7 +250,17 @@ const addEmp = () => {
 
 //function for viewing employees
 const viewEmp = () => {
+  connection.query('SELECT * FROM employee',
+    (err, results) => {
+      if (err) throw err;
 
+      const employeeArray = [];
+      results.forEach(({ first_name, last_name, role_id }) => {
+        employeeArray.push({ first_name, last_name, role_id });
+      });
+      console.table(employeeArray);
+      init();
+    })
 }
 
 
@@ -282,17 +292,7 @@ init = () => {
           break;
 
         case ('VIEW_EMPLOYEES'):
-          connection.query('SELECT * FROM employee',
-            (err, results) => {
-              if (err) throw err;
-
-              const employeeArray = [];
-              results.forEach(({ first_name, last_name, role_id }) => {
-                employeeArray.push({ first_name, last_name, role_id });
-              });
-              console.table(employeeArray);
-              init();
-            })
+          viewEmp();
           break;
 
 
