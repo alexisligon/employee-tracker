@@ -196,18 +196,12 @@ const addEmp = () => {
           name: jobRole.title,
         }
       })
-      console.log("jobRoleChoices:", jobRoleChoices)
       inquirer.prompt(
         [
           {
             type: 'input',
-            message: "What is the employee's first name?",
+            message: "What is the employee's name?",
             name: 'empFirstName'
-          },
-          {
-            type: 'input',
-            message: "What is the employee's last name?",
-            name: 'empLastName'
           },
           {
             type: 'list',
@@ -231,10 +225,9 @@ const addEmp = () => {
           connection.query(
             'INSERT INTO employee SET ?',
             {
-              first_name: answer.empFirstName,
-              last_name: answer.empLastName,
+              name: answer.empFirstName,
               role_id: answer.empJobRole,
-              manager_id: answer.empsMan,
+              // manager_id: answer.empsMan,
             },
             (err) => {
               if (err) throw err;
@@ -250,19 +243,63 @@ const addEmp = () => {
 
 //function for viewing employees
 const viewEmp = () => {
+  connection.query('SELECT employee.name, employee.role_id, role.title FROM employee INNER JOIN role ON employee.role_id = role.id',
+    (err, results) => {
+  if (err) throw err;
+
+  const employeeArray = [];
+  results.forEach(({ name, role_id, title }) => {
+    employeeArray.push({ name, role_id, title });
+  });
+  console.table(employeeArray);
+  init();
+})
+}
+
+//function for updating employee roles
+const updateEmpRole = () => {
   connection.query('SELECT * FROM employee',
     (err, results) => {
       if (err) throw err;
 
-      const employeeArray = [];
-      results.forEach(({ first_name, last_name, role_id }) => {
-        employeeArray.push({ first_name, last_name, role_id });
-      });
-      console.table(employeeArray);
-      init();
+      inquirer.prompt([
+        {
+          name: 'chosenEmployee',
+          type: 'rawlist',
+          choices() {
+            const choiceArray = [];
+            results.forEach(({ id, first_name, last_name, role_id }) => {
+              choiceArray.push(id, first_name, last_name, role_id);
+            });
+            return choiceArray;
+          },
+          message: 'Which employee would you like to update?'
+        }]).then((answer) => {
+          console.log('chosen employee: ', answer.chosenEmployee)
+        })
+
+      // const employeeChoices = results.map(function (employee) {
+      //   return {
+      //     value: employee.id,
+      //     name: `${employee.first_name} ${employee.last_name}`,
+      //   }
+      // });
+      // inquirer.prompt([
+      //   {
+      //     type: 'list',
+      //     message: 'Which employee would you like to update?',
+      //     name: 'employeeChoice',
+      //     choices: employeeChoices
+      //   },
+
+      // ]).then((answer) => {
+      //   connection.query('SELECT * FROM employee WHERE ')
+      //   console.log('chosen employee to update: ', answer.employeeChoice )
+      //   init();
+      // })
+
     })
 }
-
 
 init = () => {
   inquirer.prompt(questions)
@@ -295,6 +332,9 @@ init = () => {
           viewEmp();
           break;
 
+        case ('UPDATE_EMPLOYEE_ROLE'):
+          updateEmpRole();
+          break;
 
         default:
           break;
