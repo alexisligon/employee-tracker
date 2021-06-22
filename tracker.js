@@ -116,7 +116,75 @@ const viewDept = () => {
     })
 }
 
-//add employee questions
+//function for adding a job role
+const addRole = () => {
+  connection.query(
+    'SELECT * FROM department',
+    (err, results) => {
+      if (err) throw err;
+      //renames key value pairs for inquirer choices of department
+      const departmentChoices = results.map(function (department) {
+        return {
+          value: department.id,
+          name: department.name,
+        }
+      })
+      //Questions for job roles to add
+      inquirer.prompt([
+        {
+          type: 'input',
+          message: 'What job role do you want to add?',
+          name: 'jobRole'
+        },
+        {
+          type: 'input',
+          message: 'What is the starting salary for this job role?',
+          name: 'jobSalary'
+        },
+        {
+          type: 'list',
+          message: 'What department is this job role in?',
+          name: 'roleDepartment',
+          choices: departmentChoices
+        }
+      ])
+        .then((answer) => {
+          connection.query(
+            'INSERT INTO role SET ?',
+            {
+              title: answer.jobRole,
+              salary: answer.jobSalary,
+              department_id: answer.roleDepartment,
+
+            },
+            (err) => {
+              if (err) throw err;
+              console.log('job role added successfully!');
+              init();
+            }
+          )
+        })
+    }
+  )
+
+}
+
+//function for viewing all job roles
+const viewRoles = () => {
+  connection.query('SELECT * FROM role',
+    (err, results) => {
+      if (err) throw err;
+
+      const roleArray = [];
+      results.forEach(({ id, title, salary, department_id }) => {
+        roleArray.push({ id, title, salary, department_id });
+      });
+      console.table('Job Roles', roleArray);
+      init();
+    })
+}
+
+//function for adding employees
 const addEmp = () => {
   connection.query(
     'SELECT * FROM role',
@@ -180,66 +248,15 @@ const addEmp = () => {
 
 }
 
-
-//function for adding a job role
-const addRole = () => {
-  connection.query(
-    'SELECT * FROM department',
-    (err, results) => {
-      if (err) throw err;
-      //renames key value pairs for inquirer choices of department
-      const departmentChoices = results.map(function (department) {
-        return {
-          value: department.id,
-          name: department.name,
-        }
-      })
-      //Questions for job roles to add
-      inquirer.prompt([
-        {
-          type: 'input',
-          message: 'What job role do you want to add?',
-          name: 'jobRole'
-        },
-        {
-          type: 'input',
-          message: 'What is the starting salary for this job role?',
-          name: 'jobSalary'
-        },
-        {
-          type: 'list',
-          message: 'What department is this job role in?',
-          name: 'roleDepartment',
-          choices: departmentChoices
-        }
-      ])
-        .then((answer) => {
-          connection.query(
-            'INSERT INTO role SET ?',
-            {
-              title: answer.jobRole,
-              salary: answer.jobSalary,
-              department_id: answer.roleDepartment,
-
-            },
-            (err) => {
-              if (err) throw err;
-              console.log('job role added successfully!');
-              init();
-            }
-          )
-        })
-    }
-  )
+//function for viewing employees
+const viewEmp = () => {
 
 }
-//insert this data into role table on sql
 
 
 init = () => {
   inquirer.prompt(questions)
     .then((answer) => {
-      console.log('answer: ', answer.firstChoice);
       switch (answer.firstChoice) {
         case ('ADD_DEPARTMENT'):
           addDept()
@@ -260,14 +277,18 @@ init = () => {
           viewDept();
           break;
 
+        case ('VIEW_ROLES'):
+          viewRoles();
+          break;
+
         case ('VIEW_EMPLOYEES'):
           connection.query('SELECT * FROM employee',
             (err, results) => {
               if (err) throw err;
 
               const employeeArray = [];
-              results.forEach(({ first_name, last_name, role_id, manager_id }) => {
-                employeeArray.push({ first_name, last_name, role_id, manager_id });
+              results.forEach(({ first_name, last_name, role_id }) => {
+                employeeArray.push({ first_name, last_name, role_id });
               });
               console.table(employeeArray);
               init();
