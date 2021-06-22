@@ -78,62 +78,107 @@ const questions = [
 ]
 
 //adding a department question
-const addDept =
-  //add this data to department table
-  [
+const addDept = () => {
+  inquirer.prompt([
     {
       type: 'input',
       message: 'What department would you like to add?',
       name: 'departmentType'
     }
-  ]
+  ])
+    .then((answer) => {
+      connection.query(
+        'INSERT INTO department SET ?',
+        {
+          name: answer.departmentType,
+        },
+        (err) => {
+          if (err) throw err;
+          console.log('department added successfully!');
+          init();
+        }
+      )
+    })
+}
+
 
 //add employee questions
-const addEmp =
-  //add this data to employee table
-  [
-    {
-      type: 'input',
-      message: "What is the employee's first name?",
-      name: 'empFirstName'
-    },
-    {
-      type: 'input',
-      message: "What is the employee's last name?",
-      name: 'empLastName'
-    },
-    //change job role question from input to list type
-    //choose from job roles already entered
-    {
-      type: 'list',
-      message: "What is the employee's job role?",
-      name: 'empJobRole',
-      choices: ['Engineer', 'Intern', 'Manager']
-    },
-    {
-      type: 'list',
-      message: "Who is the employee's manager?",
-      name: 'empsMan',
-      choices: ['Manager 1', 'Manager 2', 'Manager 3']
+const addEmp = () => {
+  connection.query(
+    'SELECT * FROM role',
+    (err, results) => {
+      if (err) throw err;
+      const jobRoleChoices = results.map(function (jobRole) {
+        return {
+          value: jobRole.id,
+          name: jobRole.title,
+        }
+      })
+      inquirer.prompt(
+        [
+          {
+            type: 'input',
+            message: "What is the employee's first name?",
+            name: 'empFirstName'
+          },
+          {
+            type: 'input',
+            message: "What is the employee's last name?",
+            name: 'empLastName'
+          },
+          //change job role question from input to list type
+          //choose from job roles already entered
+          {
+            type: 'list',
+            message: "What is the employee's job role?",
+            name: 'empJobRole',
+            choices: jobRoleChoices
+          },
+          //change to select only managers
+          // {
+          //   type: 'list',
+          //   message: "Who is the employee's manager?",
+          //   name: 'empsMan',
+          //   choices: ['Manager 1', 'Manager 2', 'Manager 3']
+          // }
+        ]
+      )
+        .then((answer) => {
+          connection.query(
+            'INSERT INTO employee SET ?',
+            {
+              first_name: answer.empFirstName,
+              last_name: answer.empLastName,
+              role_id: answer.empJobRole,
+              manager_id: answer.empsMan,
+            },
+            (err) => {
+              if (err) throw err;
+              console.log('employee added successfully!');
+              init();
+            }
+          )
+        })
     }
-  ]
+  )
 
-//add job role questions
+}
+
+
+//function for adding a job role
 const addRole = () => {
-
   connection.query(
     'SELECT * FROM department',
     (err, results) => {
       if (err) throw err;
-      console.log(results);
-      const choices = results.map(function (department){
-          return {
-            value: department.id,
-            name: department.name,
-          }
+      //renames key value pairs for inquirer choices of department
+      const departmentChoices = results.map(function (department) {
+        return {
+          value: department.id,
+          name: department.name,
+        }
       })
-
-
+      //Questions for job roles to add
       inquirer.prompt([
         {
           type: 'input',
@@ -149,7 +194,7 @@ const addRole = () => {
           type: 'list',
           message: 'What department is this job role in?',
           name: 'roleDepartment',
-          choices: choices
+          choices: departmentChoices
         }
       ])
         .then((answer) => {
@@ -169,11 +214,11 @@ const addRole = () => {
           )
         })
     }
-    )
+  )
 
 }
-  //insert this data into role table on sql
-  
+//insert this data into role table on sql
+
 
 init = () => {
   inquirer.prompt(questions)
@@ -181,43 +226,11 @@ init = () => {
       console.log('answer: ', answer.firstChoice);
       switch (answer.firstChoice) {
         case ('ADD_DEPARTMENT'):
-          inquirer.prompt(addDept)
-            .then((answer) => {
-              connection.query(
-                'INSERT INTO department SET ?',
-                {
-                  name: answer.departmentType,
-                },
-                (err) => {
-                  if (err) throw err;
-                  console.log('department added successfully!');
-                  init();
-                }
-              )
-            })
+          addDept()
           break;
 
         case ('ADD_EMPLOYEE'):
-          // connection.query(
-          //   'SELECT * FROM employee WHERE manager'
-          // )
-          inquirer.prompt(addEmp)
-            .then((answer) => {
-              connection.query(
-                'INSERT INTO employee SET ?',
-                {
-                  first_name: answer.empFirstName,
-                  last_name: answer.empLastName,
-                  role_id: answer.empJobRole,
-                  manager_id: answer.empsMan,
-                },
-                (err) => {
-                  if (err) throw err;
-                  console.log('employee added successfully!');
-                  init();
-                }
-              )
-            })
+          addEmp();
           break;
 
         case ('ADD_ROLE'):
@@ -226,7 +239,6 @@ init = () => {
 
         case ('QUIT'):
           process.exit();
-
 
         case ('VIEW_DEPARTMENTS'):
           connection.query('SELECT * FROM department',
