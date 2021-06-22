@@ -77,7 +77,7 @@ const questions = [
   }
 ]
 
-//adding a department question
+//function for adding a department
 const addDept = () => {
   inquirer.prompt([
     {
@@ -101,6 +101,20 @@ const addDept = () => {
     })
 }
 
+//function for viewing all departments
+const viewDept = () => {
+  connection.query('SELECT * FROM department',
+    (err, results) => {
+      if (err) throw err;
+
+      const departmentArray = [];
+      results.forEach(({ id, name }) => {
+        departmentArray.push({ id, name });
+      });
+      console.table('Departments', departmentArray);
+      init();
+    })
+}
 
 //add employee questions
 const addEmp = () => {
@@ -114,6 +128,7 @@ const addEmp = () => {
           name: jobRole.title,
         }
       })
+      console.log("jobRoleChoices:", jobRoleChoices)
       inquirer.prompt(
         [
           {
@@ -126,14 +141,15 @@ const addEmp = () => {
             message: "What is the employee's last name?",
             name: 'empLastName'
           },
-          //change job role question from input to list type
-          //choose from job roles already entered
           {
             type: 'list',
             message: "What is the employee's job role?",
             name: 'empJobRole',
             choices: jobRoleChoices
           },
+          //if job role id is 2,4, 6 then manager is null
+          //else ask who is employee's manager
+          //display choices of 2,4,6
           //change to select only managers
           // {
           //   type: 'list',
@@ -241,17 +257,7 @@ init = () => {
           process.exit();
 
         case ('VIEW_DEPARTMENTS'):
-          connection.query('SELECT * FROM department',
-            (err, results) => {
-              if (err) throw err;
-
-              const departmentArray = [];
-              results.forEach(({ id, name }) => {
-                departmentArray.push({ id, name });
-              });
-              console.table('Departments', departmentArray);
-              init();
-            })
+          viewDept();
           break;
 
         case ('VIEW_EMPLOYEES'):
