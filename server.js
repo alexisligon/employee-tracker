@@ -21,25 +21,21 @@ const questions = [
         name: "View All Employees",
         value: "VIEW_EMPLOYEES",
       },
-      {
-        name: "View All Employees By Department",
-        value: "VIEW_EMPLOYEES_BY_DEPARTMENT",
-      },
+      // {
+      //   name: "View All Employees By Department",
+      //   value: "VIEW_EMPLOYEES_BY_DEPARTMENT",
+      // },
       {
         name: "Add Employee",
         value: "ADD_EMPLOYEE",
       },
-      {
-        name: "Remove Employee",
-        value: "REMOVE_EMPLOYEE",
-      },
+      // {
+      //   name: "Remove Employee",
+      //   value: "REMOVE_EMPLOYEE",
+      // },
       {
         name: "Update Employee Role",
         value: "UPDATE_EMPLOYEE_ROLE",
-      },
-      {
-        name: "Update Employee Manager",
-        value: "UPDATE_EMPLOYEE_MANAGER",
       },
       {
         name: "View All Roles",
@@ -49,10 +45,10 @@ const questions = [
         name: "Add Role",
         value: "ADD_ROLE",
       },
-      {
-        name: "Remove Role",
-        value: "REMOVE_ROLE",
-      },
+      // {
+      //   name: "Remove Role",
+      //   value: "REMOVE_ROLE",
+      // },
       {
         name: "View All Departments",
         value: "VIEW_DEPARTMENTS",
@@ -61,10 +57,10 @@ const questions = [
         name: "Add Department",
         value: "ADD_DEPARTMENT",
       },
-      {
-        name: "Remove Department",
-        value: "REMOVE_DEPARTMENT",
-      },
+      // {
+      //   name: "Remove Department",
+      //   value: "REMOVE_DEPARTMENT",
+      // },
       {
         name: "Quit",
         value: "QUIT",
@@ -205,7 +201,6 @@ const addEmp = () => {
           {
             name: answer.empFirstName,
             role_id: answer.empJobRole,
-            // manager_id: answer.empsMan,
           },
           (err) => {
             if (err) throw err;
@@ -254,7 +249,6 @@ const chooseUpdateEmp = () => {
         },
 
       ]).then((answer) => {
-        console.log('Chosen employee: ', answer.chosenEmployee);
         let chosenEmployee = answer.chosenEmployee;
         connection.query('SELECT * FROM role', (err, results) => {
           if (err) throw err;
@@ -273,8 +267,6 @@ const chooseUpdateEmp = () => {
               choices: jobRoleChoices
             }
           ]).then((answer) => {
-            // console.log(chosenEmployee);
-            // console.log(answer.newRole);
             connection.query('UPDATE employee SET ? WHERE ?',
               [
                 {
