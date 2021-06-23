@@ -26,10 +26,6 @@ const questions = [
         value: "VIEW_EMPLOYEES_BY_DEPARTMENT",
       },
       {
-        name: "View All Employees By Manager",
-        value: "VIEW_EMPLOYEES_BY_MANAGER",
-      },
-      {
         name: "Add Employee",
         value: "ADD_EMPLOYEE",
       },
@@ -277,55 +273,29 @@ const chooseUpdateEmp = () => {
               choices: jobRoleChoices
             }
           ]).then((answer) => {
-            console.log(chosenEmployee)
-            console.log(answer.newRole)
+            // console.log(chosenEmployee);
+            // console.log(answer.newRole);
+            connection.query('UPDATE employee SET ? WHERE ?',
+              [
+                {
+                  role_id: answer.newRole,
+                },
+                {
+                  name: chosenEmployee,
+                }
+              ],
+              (error) => {
+                if (error) throw err;
+                console.log('employee was updated successfully!')
+                init();
+                }
+            )
           })
         
         })
-        //init
       })
     }
   );
-
-  // connection.query(
-  //   "SELECT * FROM employee",
-  //   (err, results) => {
-  //     if (err) throw err;
-  //     inquirer
-  //       .prompt([
-  //         {
-  //           name: "chosenEmployee",
-  //           type: "rawlist",
-  //           choices() {
-  //             const choice1Array = [];
-  //             results.forEach(({ name }) => {
-  //               choice1Array.push(name);
-  //             });
-
-  //             return choice1Array;
-  //           },
-  //           message: "Which employee would you like to update?",
-  //         },
-  //         {
-  //           name: "newRole",
-  //           type: "rawlist",
-  //           choices() {
-  //             const choice2Array = [];
-  //             results.forEach(({title}) => {
-  //               choice2Array.push(title)
-  //             })
-  //             return choice2Array;
-  //           },
-  //           message: `What is the employee's new role?`
-  //         } 
-  //       ])
-  //       .then((answer) => {
-  //         console.log("Chosen employee: ", answer.chosenEmployee);
-  //         console.log("New Role: ", answer.newRole);
-  //         init();
-  //       });
-  //   }
-  // );
 };
 
 
@@ -373,18 +343,3 @@ connection.connect((err) => {
   if (err) throw err;
   init();
 });
-
-//What would you like to do?
-
-//ADD
-//Add a department
-//Add a role
-//Add an employee
-
-//VIEW
-//View all departments
-//View all job roles
-//View employees
-
-//UPDATE
-//update employee roles
